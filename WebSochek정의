@@ -1,0 +1,76 @@
+WebSocket은 Transport protocol로서, 웹에서 사용하는 soket입니다.
+
+- Http는 클라이언트와 서버는 연결을 유지하지 않는 Connectionless 특징이 있습니다.
+
+- socket은 클라이언트와 서버가 연결을 유지하는 특성을 갖는데,
+	WebSocket을 사용함으로써 웹에서 양방향 실시간 통신이 가능해집니다.
+
+- WebScoket 프로토콜
+	1) WebSocket은 RFC6445 표준이며,
+		WebSocket을 사용하기 위해서는 ws 프로토콜을 사용합니다.
+
+	2) 웹은 HTTP프로콜을 사용하는데, ws 프로토콜을 사용하기 위해서는 다음과 같은 과정으로 진행됩니다.
+		-HTTP에서 WebSocket으로의 프로토콜 전환을 WebScoket HandShake라고 합니다.
+
+		(1) 브라우저는 프로토콜을 HTTP에서 WebSocket으로 전환하려는 요청을 Header에 Upgrade 속성을 추가하여
+			서버로 보냅니다.
+			<Client -> Server>
+			GET /chat HTTP/1.1 Host: ws://localhost:8088/myChat/echo.do
+			Upgrade: websocket
+			Connection: Upgrade
+			
+			<Server -> Client>
+			HTTP/1.1 101 Switching Protocols
+			Upgrade: websocket
+			Connection: Upgrade
+
+		(2) 이 요청을 받은 서버가 WebSocket 프로토콜을 이해하면,
+			Upgrade 속성을 통해 프로토콜 전환을 동의하게 되고,
+			그러면 브라우저와 서버는 ws 프로토콜을 사용하게 됩니다.
+			'http://' => 'ws://'
+
+		(3) ws 프로콜로 전환되면, HTTP 연결은 중단되며 동일한 TCP/IP 연결을 통해 WebSocket 연결로 대체 됩니다.
+
+		(4) WebSocket 연결은 기본적으로 HTTP(80), HTTPS(443)와 동일한 포트를 사용합니다.	
+=====================================================================================================
+1. 클라이언트 측
+	1) 웹소켓 객체 생성합니다.
+		- 웹 소켓이 동작하기 위해서 제일 먼저 서버와 연결이 되어야 합니다.
+		- HTML5에서 제공하는 WebSocket 객체를 통해 서버 연결을 수행합니다.
+		- 프로토콜 ws를 사용합니다.
+		- 웹소켓 객체 만드는 코드
+			ws = new WebSocket("ws://localhost:8088/myChat/echo.do");
+
+	2) 이벤트
+		① 웹 소켓이 연결되었을 때 호출되는 이벤트
+			ws.onopen=function(event){}
+		② 서버에서 전송하는 데이터를 받으려면 message이벤트를 구현하면 됩니다.
+			ws.onmessage=funcion(event){};
+		③ 웹 소켓이 닫혔을 때 호출되는 이벤트입니다.
+			ws.onclose=function(event){}
+
+2. 서버측
+	① /echo.do 라는 url 요청을 통해 웹소켓에 들어가겠다라는 애노테이션입니다.
+		@Controller
+		@ServerEndpoint(value="/echo.do") // 클라이언트에 접속할 서버 주소
+	② @OnOpen 는 클라이언트가 웹소켓에 들어오고 서버에 아무런 문제 없이 들어왔을때 실행하는 애노테이션
+	③ @OnMessage 는 클라이언트에게 메시지가 들어왔을 때 실행하는 애노테이션
+	④ @OnError 는 웹소켓이 에러가 발생했을 때 실행하는 애노테이션
+	⑤ @OnClose 는 클라이언트와 웹소켓과의 연결이 끊기면 실행하는 애노테이션
+
+3. web.xml에서
+	<async-supported>true</async-supported> <!-- 웹 소켓을 위한 비동기 방식 설정 -->
+	
+	<servlet-mapping>
+		<servlet-name>appServlet</servlet-name>
+		<url-pattern>/</url-pattern>
+	</servlet-mapping>
+
+4. pom.xml
+	<dependency>
+		<groupId>org.springframework</groupId>
+
+5. Project 선택 후 우클릭 => Properties
+	Project Pacets => Java버전 1.8
+			=> Runtimes 탭 선택 => Apache Tomcat v8.5 선탣
+	</dependency>

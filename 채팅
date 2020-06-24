@@ -1,0 +1,25 @@
+1. 로그인 후 채팅화면으로 이동
+	1) 웹 소켓에 접속
+	2) 로그인 처리하면서 model에 저장한 name과 filename을 쿼리스트링 형식으로 서버에 전송
+
+2. EchoHandler.java의 @OnOpen
+	쿼리 스트링에서 name값과 filename의 값을 추출해서 Cart에 담습니다.
+	Cart를 ArrayList에 담습니다.
+	
+	private Session session;
+	private String id;
+	private String filename;
+	
+3. EchoHandler.java의 sendALlSessionToMessage()를 이용해서 나를 제외한 모든 사람에게 메세지를 보냅니다.
+	1) getInfo() - 보낸 사람의 정보를 구합니다.
+	2) 나를 제외한 모든 사람에게 메시지를 보냅니다.
+	
+4. boot.jsp에서 onmessage 이벤트에서 받고 DOM 객체 생성을 통해서 BODY에 출력합니다.
+	1) 퇴장과 입장은 채팅방 중간에 나타나도록 합니다.
+	2) 받은 메시지를 의미하는 class='replies'를 이용해서 DOM 객체를 생성합니다.
+	
+5. 내가 메시지를 작성하고 엔터를 치면 class="sent"를 이용해서 DOM 객체를 생성합니다.
+
+6. 빈 메시지가 아닌 경우 소켓에 메시지
+
+7. 나가기를 클릭하면 로그아웃
